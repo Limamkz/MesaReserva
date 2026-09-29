@@ -1,2 +1,60 @@
 <?php declare(strict_types=1); require_once __DIR__.'/includes/functions.php'; require_login(); if(is_admin()) redirect('dashboard.php'); $cid=current_client_id(); if(!$cid) redirect('cliente.php'); $error=null; $mesas=$pdo->query("SELECT id,numero,capacidade FROM mesas WHERE status='disponivel' ORDER BY numero")->fetchAll(); if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$mesa=(int)($_POST['mesa_id']??0);$data=$_POST['data_reserva']??'';$hora=$_POST['hora_reserva']??'';$pessoas=(int)($_POST['pessoas']??0);$obs=trim($_POST['observacoes']??'');$s=$pdo->prepare('SELECT capacidade FROM mesas WHERE id=? AND status=\'disponivel\'');$s->execute([$mesa]);$cap=(int)$s->fetchColumn();if(!$cap||$pessoas<1||$pessoas>$cap)$error='Escolha uma mesa disponível compatível com a quantidade de pessoas.';elseif(!$data||!$hora)$error='Informe a data e o horário.';else{$s=$pdo->prepare("SELECT COUNT(*) FROM reservas WHERE mesa_id=? AND data_reserva=? AND hora_reserva=? AND status IN ('pendente','confirmada')");$s->execute([$mesa,$data,$hora]);if((int)$s->fetchColumn()>0)$error='Esse horário já foi solicitado para a mesa escolhida.';else{$s=$pdo->prepare("INSERT INTO reservas(cliente_id,mesa_id,data_reserva,hora_reserva,pessoas,status,observacoes) VALUES(?,?,?,?,?,'pendente',?)");$s->execute([$cid,$mesa,$data,$hora,$pessoas,$obs]);flash('success','Reserva enviada! A administração irá confirmar o horário.');redirect('minhas-reservas.php');}}} $pageTitle='Reservar mesa'; require __DIR__.'/partials/client-header.php'; ?>
-<div class="page-heading"><div><span class="section-kicker">RESERVA ONLINE</span><h2>Escolha seu momento</h2><p>Selecione uma mesa disponível, data, horário e quantidade de pessoas.</p></div><div class="availability-card small"><strong><?= count($mesas) ?></strong><span>mesas disponíveis</span></div></div><section class="card form-card"><div class="card-body"><?php if($error): ?><div class="login-error"><?= e($error) ?></div><?php endif; ?><form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><div class="form-grid"><div class="form-group full"><label>Mesa *</label><select class="form-control" name="mesa_id" required><option value="">Selecione uma mesa</option><?php foreach($mesas as $m): ?><option value="<?= $m['id'] ?>">Mesa <?= e($m['numero']) ?> — até <?= (int)$m['capacidade'] ?> pessoas</option><?php endforeach; ?></select></div><div class="form-group"><label>Data *</label><input class="form-control" type="date" name="data_reserva" min="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d') ?>" required></div><div class="form-group"><label>Horário *</label><input class="form-control" type="time" name="hora_reserva" required></div><div class="form-group"><label>Pessoas *</label><input class="form-control" type="number" name="pessoas" min="1" max="50" value="2" required></div><div class="form-group full"><label>Observações</label><textarea class="form-control" name="observacoes" placeholder="Ex.: aniversário, necessidade de acessibilidade, preferência..."></textarea></div></div><div class="form-actions"><a class="btn btn-light" href="<?= url('cliente.php') ?>">Voltar</a><button class="btn btn-primary">Solicitar reserva <span class="material-symbols-outlined">arrow_forward</span></button></div></form></div></section><?php require __DIR__.'/partials/footer-client.php'; ?>
+<div class="page-heading">
+    <div>
+        <span class="section-kicker">RESERVA ONLINE</span>
+        <h2>Escolha seu momento</h2>
+        <p>Selecione uma mesa disponível, data, horário e quantidade de pessoas.</p>
+    </div>
+    <div class="availability-card small">
+        <strong>
+            <?= count($mesas) ?>
+        </strong>
+        <span>mesas disponíveis</span>
+    </div>
+</div>
+<section class="card form-card">
+    <div class="card-body">
+        <?php if($error): ?>
+        <div class="login-error">
+            <?= e($error) ?>
+        </div>
+        <?php endif; ?>
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Mesa *</label>
+                    <select class="form-control" name="mesa_id" required>
+                        <option value="">Selecione uma mesa</option>
+                        <?php foreach($mesas as $m): ?>
+                        <option value="<?= $m['id'] ?>">Mesa <?= e($m['numero']) ?> — até <?= (int)$m['capacidade'] ?> pessoas</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data *</label>
+                    <input class="form-control" type="date" name="data_reserva" min="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d') ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>Horário *</label>
+                    <input class="form-control" type="time" name="hora_reserva" required>
+                </div>
+                <div class="form-group">
+                    <label>Pessoas *</label>
+                    <input class="form-control" type="number" name="pessoas" min="1" max="50" value="2" required>
+                </div>
+                <div class="form-group full">
+                    <label>Observações</label>
+                    <textarea class="form-control" name="observacoes" placeholder="Ex.: aniversário, necessidade de acessibilidade, preferência...">
+                    </textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <a class="btn btn-light" href="<?= url('cliente.php') ?>">Voltar</a>
+                <button class="btn btn-primary">Solicitar reserva <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+<?php require __DIR__.'/partials/footer-client.php'; ?>

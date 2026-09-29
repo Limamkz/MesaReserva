@@ -37,7 +37,7 @@ RECURSOS
 - Avaliações
 - Dashboard e CRUDs para administração
 - Política de privacidade detalhada
-- Instagram @mesa.reserva no rodapé
+- Ícones do Instagram e WhatsApp no rodapé, com acesso direto pelos botões
 
 SEGURANÇA
 - PDO + prepared statements

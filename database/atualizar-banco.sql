@@ -10,6 +10,6 @@ ALTER TABLE usuarios ADD CONSTRAINT fk_usuario_cliente FOREIGN KEY (cliente_id) 
 CREATE TABLE IF NOT EXISTS perguntas (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, usuario_id INT UNSIGNED NOT NULL, assunto VARCHAR(150) NOT NULL, mensagem TEXT NOT NULL, resposta TEXT NULL, status ENUM('aberta','respondida') NOT NULL DEFAULT 'aberta', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, respondida_em DATETIME NULL, CONSTRAINT fk_perguntas_usuario FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON UPDATE CASCADE ON DELETE CASCADE) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS avaliacoes (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, usuario_id INT UNSIGNED NOT NULL, nota TINYINT UNSIGNED NOT NULL, comentario VARCHAR(1000) NULL, aprovado TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_avaliacoes_usuario FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON UPDATE CASCADE ON DELETE CASCADE) ENGINE=InnoDB;
 
--- Preserva a conta antiga: a primeira conta vira administradora e contas administrativas ficam verificadas.
-UPDATE usuarios SET tipo='admin', email_verificado_em=COALESCE(email_verificado_em,NOW()) WHERE id=(SELECT id FROM (SELECT MIN(id) id FROM usuarios) x);
-UPDATE usuarios SET email_verificado_em=COALESCE(email_verificado_em,NOW()) WHERE tipo='admin';
+    -- Preserva a conta antiga: a primeira conta vira administradora e contas administrativas ficam verificadas.
+    UPDATE usuarios SET tipo='admin', email_verificado_em=COALESCE(email_verificado_em,NOW()) WHERE id=(SELECT id FROM (SELECT MIN(id) id FROM usuarios) x);
+    UPDATE usuarios SET email_verificado_em=COALESCE(email_verificado_em,NOW()) WHERE tipo='admin';

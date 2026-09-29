@@ -11,12 +11,12 @@ function current_user_name(): string { return $_SESSION['usuario_nome'] ?? 'Usu√
 function current_user_id(): int { return (int)($_SESSION['usuario_id'] ?? 0); }
 function current_client_id(): int { return (int)($_SESSION['cliente_id'] ?? 0); }
 function login_user(array $user): void {
-    session_regenerate_id(true);
-    $_SESSION['usuario_id']=(int)$user['id'];
-    $_SESSION['usuario_nome']=$user['nome'];
-    $_SESSION['usuario_email']=$user['email'];
-    $_SESSION['usuario_tipo']=$user['tipo'] ?? 'cliente';
-    $_SESSION['cliente_id']=(int)($user['cliente_id'] ?? 0);
+session_regenerate_id(true);
+$_SESSION['usuario_id']=(int)$user['id'];
+$_SESSION['usuario_nome']=$user['nome'];
+$_SESSION['usuario_email']=$user['email'];
+$_SESSION['usuario_tipo']=$user['tipo'] ?? 'cliente';
+$_SESSION['cliente_id']=(int)($user['cliente_id'] ?? 0);
 }
 function logout_user(): void { $_SESSION=[]; if(ini_get('session.use_cookies')){ $p=session_get_cookie_params(); setcookie(session_name(),' ',time()-42000,$p['path'],$p['domain'],$p['secure'],$p['httponly']); } session_destroy(); }
 function csrf_token(): string { if(empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32)); return $_SESSION['csrf_token']; }

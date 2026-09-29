@@ -1,0 +1,16 @@
+MESARESERVA — IMAGENS
+
+O projeto foi deixado sem depender das imagens antigas.
+
+Quando quiser adicionar sua foto principal:
+1) coloque a imagem nesta pasta com o nome: hero-restaurante.jpg
+2) abra assets/css/style.css
+3) procure por: "IMAGEM DO RESTAURANTE — ADICIONE AQUI"
+4) descomente a linha indicada.
+
+O CSS já usa background-size: cover e background-position: center,
+então a imagem fica cortada/preenchida automaticamente sem deformar.
+
+Para a marca, o sistema usa agora o texto MesaReserva no header.
+Se depois quiser usar uma logo em PNG/SVG, substitua o .brand-wordmark
+nos partials pelo seu arquivo.
