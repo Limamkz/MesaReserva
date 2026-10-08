@@ -34,4 +34,4 @@
         </form>
     </div>
 </section>
-<?php require __DIR__.'/partials/footer-client.php'; ?>
+<?php require __DIR__.'/partials/footer.php'; ?>

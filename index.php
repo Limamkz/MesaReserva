@@ -13,7 +13,7 @@ $reviews=$pdo->query("SELECT a.nota,a.comentario,u.nome FROM avaliacoes a INNER 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20260929c') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261008painel3') ?>">
     </head>
     <body class="public-body">
         <header class="public-nav">
@@ -120,4 +120,4 @@ $reviews=$pdo->query("SELECT a.nota,a.comentario,u.nome FROM avaliacoes a INNER 
                         </a>
                     </section>
                 </main>
-                <?php require __DIR__.'/partials/footer-public.php'; ?>
+                <?php require __DIR__.'/partials/footer.php'; ?>

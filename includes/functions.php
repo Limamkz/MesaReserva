@@ -161,3 +161,26 @@ return send_smtp_mail($email, $subject, $message);
 }
 
 function available_tables_count(PDO $pdo): int { return (int)$pdo->query("SELECT COUNT(*) FROM mesas WHERE status='disponivel'")->fetchColumn(); }
+
+function current_user_avatar(): ?string
+{
+    if (!is_logged_in()) return null;
+
+    $sessionAvatar = $_SESSION['usuario_avatar'] ?? null;
+    if ($sessionAvatar !== null && $sessionAvatar !== '') {
+        return (string)$sessionAvatar;
+    }
+
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare('SELECT avatar FROM usuarios WHERE id = ? LIMIT 1');
+        $stmt->execute([current_user_id()]);
+        $avatar = $stmt->fetchColumn();
+        return $avatar ? (string)$avatar : null;
+    } catch (PDOException $e) {
+        // Compatibilidade com bancos antigos: a coluna pode ainda não existir.
+        return null;
+    }
+}
+

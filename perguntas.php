@@ -72,4 +72,4 @@
             </div>
         </section>
     </div>
-    <?php require __DIR__.'/partials/footer-client.php'; ?>
+    <?php require __DIR__.'/partials/footer.php'; ?>

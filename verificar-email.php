@@ -71,7 +71,7 @@ $message = 'Não há um cadastro pendente nesta sessão. Crie sua conta ou faça
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>Verificar e-mail | MesaReserva</title>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20260929c') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261008painel3') ?>">
     </head>
     <body>
         <div class="center-page">
@@ -118,5 +118,6 @@ $message = 'Não há um cadastro pendente nesta sessão. Crie sua conta ou faça
             <?php endif; ?>
         </div>
     </div>
+<?php require __DIR__.'/partials/footer.php'; ?>
 </body>
 </html>

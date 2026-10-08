@@ -50,6 +50,9 @@ $pdo->exec("ALTER TABLE usuarios ADD COLUMN tipo ENUM('admin','cliente') NOT NUL
 if (!$columnExists($pdo, 'usuarios', 'cliente_id')) {
 $pdo->exec("ALTER TABLE usuarios ADD COLUMN cliente_id INT UNSIGNED NULL AFTER tipo");
 }
+if (!$columnExists($pdo, 'usuarios', 'avatar')) {
+$pdo->exec("ALTER TABLE usuarios ADD COLUMN avatar VARCHAR(255) NULL AFTER cliente_id");
+}
 if (!$columnExists($pdo, 'usuarios', 'email_verificado_em')) {
 $pdo->exec("ALTER TABLE usuarios ADD COLUMN email_verificado_em DATETIME NULL AFTER ativo");
 }

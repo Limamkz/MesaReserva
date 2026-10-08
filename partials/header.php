@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 
 $pageTitle = $pageTitle ?? APP_NAME;
+$layoutType = 'admin';
 $flash = get_flash();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 ?>
@@ -18,15 +19,14 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20260929c') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261008painel3') ?>">
     </head>
     <body>
         <div class="app-shell">
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-brand">
                     <a href="<?= url('dashboard.php') ?>" class="brand-link">
-                        <span class="brand-wordmark">Mesa<span>Reserva</span>
-                    </span>
+                        <img src="<?= url('assets/img/logo.png') ?>" alt="MesaReserva" class="sidebar-logo">
                 </a>
             </div>
             <nav class="sidebar-nav">
@@ -43,9 +43,14 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                     <span class="material-symbols-outlined">calendar_month</span>
                     <span>Reservas</span>
                 </a>
+                <div class="nav-label nav-label-space">USUÁRIOS</div>
                 <a class="nav-item <?= str_contains($currentPath, '/clientes/') ? 'active' : '' ?>" href="<?= url('clientes/index.php') ?>">
                     <span class="material-symbols-outlined">groups</span>
                     <span>Clientes</span>
+                </a>
+                <a class="nav-item <?= str_contains($currentPath, '/admins/') ? 'active' : '' ?>" href="<?= url('admins/index.php') ?>">
+                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                    <span>Administradores</span>
                 </a>
                 <a class="nav-item <?= str_contains($currentPath, '/consumos/') ? 'active' : '' ?>" href="<?= url('consumos/index.php') ?>">
                     <span class="material-symbols-outlined">receipt_long</span>
@@ -75,17 +80,20 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                 </a>
             </nav>
             <div class="sidebar-bottom">
-                <div class="user-mini">
-                    <div class="user-avatar">
-                        <?= e(mb_strtoupper(mb_substr(current_user_name(), 0, 1))) ?>
-                    </div>
+                <a class="user-mini user-mini-link" href="<?= url('perfil.php') ?>" title="Abrir meu perfil">
+                    <?php $avatar = current_user_avatar(); ?>
+                    <?php if ($avatar): ?>
+                        <img class="user-avatar user-avatar-image" src="<?= url($avatar) ?>" alt="Foto de <?= e(current_user_name()) ?>">
+                    <?php else: ?>
+                        <div class="user-avatar">
+                            <?= e(mb_strtoupper(mb_substr(current_user_name(), 0, 1))) ?>
+                        </div>
+                    <?php endif; ?>
                     <div>
-                        <strong>
-                            <?= e(current_user_name()) ?>
-                        </strong>
-                        <span>Administrador</span>
+                        <strong><?= e(current_user_name()) ?></strong>
+                        <span>Administrador · Meu perfil</span>
                     </div>
-                </div>
+                </a>
             </div>
         </aside>
         <div class="main-area">

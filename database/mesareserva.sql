@@ -17,6 +17,7 @@ CREATE TABLE usuarios (
     senha VARCHAR(255) NOT NULL,
     tipo ENUM('admin','cliente') NOT NULL DEFAULT 'cliente',
     cliente_id INT UNSIGNED NULL,
+    avatar VARCHAR(255) NULL,
     ativo TINYINT(1) NOT NULL DEFAULT 1,
     email_verificado_em DATETIME NULL,
     token_verificacao CHAR(64) NULL,

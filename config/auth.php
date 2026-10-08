@@ -17,6 +17,7 @@ $_SESSION['usuario_nome']=$user['nome'];
 $_SESSION['usuario_email']=$user['email'];
 $_SESSION['usuario_tipo']=$user['tipo'] ?? 'cliente';
 $_SESSION['cliente_id']=(int)($user['cliente_id'] ?? 0);
+$_SESSION['usuario_avatar']=$user['avatar'] ?? null;
 }
 function logout_user(): void { $_SESSION=[]; if(ini_get('session.use_cookies')){ $p=session_get_cookie_params(); setcookie(session_name(),' ',time()-42000,$p['path'],$p['domain'],$p['secure'],$p['httponly']); } session_destroy(); }
 function csrf_token(): string { if(empty($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32)); return $_SESSION['csrf_token']; }

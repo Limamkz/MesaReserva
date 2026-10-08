@@ -2,6 +2,7 @@ USE MesaReserva;
 
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS tipo ENUM('admin','cliente') NOT NULL DEFAULT 'cliente' AFTER senha;
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cliente_id INT UNSIGNED NULL AFTER tipo;
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS avatar VARCHAR(255) NULL AFTER cliente_id;
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS email_verificado_em DATETIME NULL AFTER ativo;
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS token_verificacao CHAR(64) NULL AFTER email_verificado_em;
 ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS token_expira_em DATETIME NULL AFTER token_verificacao;

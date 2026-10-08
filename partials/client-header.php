@@ -1,5 +1,6 @@
 <?php
 $pageTitle = $pageTitle ?? 'Área do cliente';
+$layoutType = 'client';
 $flash = get_flash();
 $currentPath = $_SERVER['PHP_SELF'] ?? '';
 ?>
@@ -14,15 +15,14 @@ $currentPath = $_SERVER['PHP_SELF'] ?? '';
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20260929c') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261008painel3') ?>">
     </head>
     <body>
         <div class="app-shell">
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-brand">
                     <a href="<?= url('cliente.php') ?>" class="brand-link">
-                        <span class="brand-wordmark brand-wordmark-dark">Mesa<span>Reserva</span>
-                    </span>
+                        <img src="<?= url('assets/img/logo.png') ?>" alt="MesaReserva" class="sidebar-logo">
                 </a>
             </div>
             <nav class="sidebar-nav">
@@ -38,6 +38,10 @@ $currentPath = $_SERVER['PHP_SELF'] ?? '';
                 <a class="nav-item <?= str_contains($currentPath, '/minhas-reservas.php') ? 'active' : '' ?>" href="<?= url('minhas-reservas.php') ?>">
                     <span class="material-symbols-outlined">event_note</span>
                     <span>Minhas reservas</span>
+                </a>
+                <a class="nav-item <?= str_contains($currentPath, '/perfil.php') ? 'active' : '' ?>" href="<?= url('perfil.php') ?>">
+                    <span class="material-symbols-outlined">person</span>
+                    <span>Meu perfil</span>
                 </a>
                 <div class="nav-label nav-label-space">ATENDIMENTO</div>
                 <a class="nav-item <?= str_contains($currentPath, '/perguntas.php') ? 'active' : '' ?>" href="<?= url('perguntas.php') ?>">
@@ -63,17 +67,20 @@ $currentPath = $_SERVER['PHP_SELF'] ?? '';
                 </a>
             </nav>
             <div class="sidebar-bottom">
-                <div class="user-mini">
-                    <div class="user-avatar">
-                        <?= e(mb_strtoupper(mb_substr(current_user_name(), 0, 1))) ?>
-                    </div>
+                <a class="user-mini user-mini-link" href="<?= url('perfil.php') ?>" title="Editar meu perfil">
+                    <?php $avatar = current_user_avatar(); ?>
+                    <?php if ($avatar): ?>
+                        <img class="user-avatar user-avatar-image" src="<?= url($avatar) ?>" alt="Foto de <?= e(current_user_name()) ?>">
+                    <?php else: ?>
+                        <div class="user-avatar">
+                            <?= e(mb_strtoupper(mb_substr(current_user_name(), 0, 1))) ?>
+                        </div>
+                    <?php endif; ?>
                     <div>
-                        <strong>
-                            <?= e(current_user_name()) ?>
-                        </strong>
-                        <span>Cliente</span>
+                        <strong><?= e(current_user_name()) ?></strong>
+                        <span>Cliente · Editar perfil</span>
                     </div>
-                </div>
+                </a>
             </div>
         </aside>
         <div class="main-area">

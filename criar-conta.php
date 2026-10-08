@@ -16,9 +16,9 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20260929c') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261008painel3') ?>">
     </head>
-    <body>
+    <body class="auth-page">
         <div class="login-page">
             <section class="login-visual">
                 <div class="login-copy">
@@ -31,6 +31,16 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
             </section>
             <section class="login-panel">
                 <div class="login-box">
+                    <div class="auth-back-row">
+                        <a class="auth-back-button" href="<?= url() ?>" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            Voltar
+                        </a>
+                        <a class="auth-home-button" href="<?= url() ?>">
+                            <span class="material-symbols-outlined">home</span>
+                            Início
+                        </a>
+                    </div>
                     <a href="<?= url() ?>">
                         <img class="login-logo" src="<?= url('assets/img/logo.png') ?>" alt="MesaReserva">
                 </a>
@@ -73,9 +83,6 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
                         <label for="senha">Senha</label>
                         <div class="password-wrap">
                             <input id="senha" class="form-control" type="password" name="senha" minlength="8" autocomplete="new-password" required>
-                            <button type="button" class="password-toggle" data-target="senha" aria-label="Mostrar senha">
-                                <span class="material-symbols-outlined">visibility</span>
-                            </button>
                         </div>
                     </div>
                     <div class="password-rules" id="passwordRules">
@@ -91,9 +98,6 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
                                                 <label for="confirmacao">Confirmar senha</label>
                                                 <div class="password-wrap">
                                                     <input id="confirmacao" class="form-control" type="password" name="confirmacao" minlength="8" autocomplete="new-password" required>
-                                                    <button type="button" class="password-toggle" data-target="confirmacao" aria-label="Mostrar confirmação">
-                                                        <span class="material-symbols-outlined">visibility</span>
-                                                    </button>
                                                 </div>
                                                 <div id="passwordMatch" class="password-match">
                                                 </div>
@@ -125,16 +129,6 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
 
                                 radios.forEach((radio) => radio.addEventListener('change', toggle));
                                 toggle();
-
-                                document.querySelectorAll('.password-toggle').forEach((button) => {
-                                button.addEventListener('click', () => {
-                                const input = document.getElementById(button.dataset.target);
-                                const icon = button.querySelector('span');
-
-                                input.type = input.type === 'password' ? 'text' : 'password';
-                                icon.textContent = input.type === 'password' ? 'visibility' : 'visibility_off';
-                                });
-                                });
 
                                 function rule(name, ok) {
                                 const element = document.querySelector('[data-rule="' + name + '"]');
@@ -188,5 +182,6 @@ try{$pdo->beginTransaction();$check=$pdo->prepare('SELECT id FROM usuarios WHERE
                                 }
                                 });
                             </script>
-                        </body>
+                        <?php require __DIR__.'/partials/footer.php'; ?>
+</body>
                     </html>
