@@ -15,6 +15,26 @@ function url(string $path = ''): string
 return BASE_URL . ($path ? '/' . ltrim($path, '/') : '');
 }
 
+/**
+ * Monta a URL pública para links enviados por e-mail.
+ * Em rede local, usa o mesmo host pelo qual a pessoa abriu o site
+ * (por exemplo, 192.168.0.25), em vez de fixar localhost.
+ */
+function verification_base_url(): string
+{
+    $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+
+    // Aceita somente host/IP e porta, evitando caracteres inesperados no link.
+    if ($host !== '' && preg_match('/^[a-zA-Z0-9.-]+(?::[0-9]{1,5})?$/', $host)) {
+        $https = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && strtolower((string)$_SERVER['HTTPS']) !== 'off';
+        $scheme = $https ? 'https' : 'http';
+        return $scheme . '://' . $host . BASE_URL;
+    }
+
+    // Fallback para instalações em que o servidor não fornece HTTP_HOST.
+    return rtrim(APP_URL, '/');
+}
+
 function redirect(string $path): never
 {
 header('Location: ' . url($path));
@@ -154,7 +174,7 @@ throw $e;
 
 function send_verification_email(string $nome, string $email, string $token): bool
 {
-$link = rtrim(APP_URL, '/') . '/verificar-email.php?token=' . urlencode($token);
+$link = rtrim(verification_base_url(), '/') . '/verificar-email.php?token=' . urlencode($token);
 $subject = 'Confirme seu e-mail — MesaReserva';
 $message = "Olá, {$nome}!\n\nSua conta no MesaReserva foi criada com sucesso. Para ativá-la, confirme seu e-mail acessando:\n\n{$link}\n\nEste link é válido por 24 horas. Se você não criou esta conta, ignore esta mensagem.\n\nMesaReserva\nSua mesa, seu horário, sua reserva.";
 return send_smtp_mail($email, $subject, $message);
