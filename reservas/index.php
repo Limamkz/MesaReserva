@@ -3,6 +3,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 $pageTitle='Reservas';
+
+// Reservas não concluídas que passaram do horário deixam de ficar pendentes/confirmadas.
+$pdo->exec("UPDATE reservas SET status='expirada'
+            WHERE status IN ('pendente','confirmada')
+            AND TIMESTAMP(data_reserva, hora_reserva) < NOW();");
 $filterDate=$_GET['data']??'';
 $where='';$params=[];
 if($filterDate){$where='WHERE r.data_reserva = ?';$params[]=$filterDate;}
@@ -39,7 +44,6 @@ require __DIR__.'/../partials/header.php';
                                     <th>Mesa</th>
                                     <th>Pessoas</th>
                                     <th>Status</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,19 +72,23 @@ require __DIR__.'/../partials/header.php';
                                         <?= (int)$r['pessoas'] ?>
                                     </td>
                                     <td>
-                                        <span class="status-badge <?= status_class($r['status']) ?>">
-                                            <?= status_label($r['status']) ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="row-actions">
-                                            <a class="icon-action" href="<?= url('reservas/form.php?id='.$r['id']) ?>">
-                                                <span class="material-symbols-outlined">edit</span>
-                                            </a>
-                                            <a class="icon-action danger" data-confirm="Excluir esta reserva?" href="<?= url('reservas/delete.php?id='.$r['id']) ?>">
-                                                <span class="material-symbols-outlined">delete</span>
-                                            </a>
-                                        </div>
+                                        <?php if ($r['status'] === 'expirada'): ?>
+                                            <span class="status-badge status-expirada reservation-expired-label">Reserva expirada</span>
+                                        <?php else: ?>
+                                            <form class="reservation-status-form" method="post" action="<?= url('reservas/atualizar-status.php') ?>">
+                                                <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
+                                                <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                                                <select class="form-control reservation-status-select <?= e(status_class($r['status'])) ?>"
+                                                        name="status" aria-label="Alterar status da reserva"
+                                                        onchange="this.form.submit()"
+                                                        <?= in_array($r['status'], ['cancelada','concluida'], true) ? 'disabled' : '' ?>>
+                                                    <option value="pendente" <?= $r['status']==='pendente'?'selected':'' ?>>Pendente</option>
+                                                    <option value="confirmada" <?= $r['status']==='confirmada'?'selected':'' ?>><?= $r['status']==='confirmada'?'Confirmada':'Confirmar reserva' ?></option>
+                                                    <option value="cancelada" <?= $r['status']==='cancelada'?'selected':'' ?>><?= $r['status']==='cancelada'?'Recusada':'Recusar reserva' ?></option>
+                                                    <option value="concluida" <?= $r['status']==='concluida'?'selected':'' ?>><?= $r['status']==='concluida'?'Concluída':'Marcar como concluída' ?></option>
+                                                </select>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -94,4 +102,11 @@ require __DIR__.'/../partials/header.php';
                     </div>
                     <?php endif; ?>
                 </section>
-                <?php require __DIR__.'/../partials/footer.php'; ?>
+                <style>
+.status-expirada { color:#7b4d18; background:#f8ead1; }
+.reservation-status-form { min-width: 175px; }
+.reservation-status-select { min-width: 175px; padding: 9px 30px 9px 10px; font-size: 13px; }
+.reservation-status-select:disabled { opacity: .8; cursor: not-allowed; }
+.reservation-expired-label { display: inline-flex; align-items: center; min-height: 36px; white-space: nowrap; }
+</style>
+<?php require __DIR__.'/../partials/footer.php'; ?>

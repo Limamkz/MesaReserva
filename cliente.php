@@ -1,4 +1,5 @@
-<?php declare(strict_types=1); require_once __DIR__.'/includes/functions.php'; require_login(); if(is_admin()) redirect('dashboard.php'); $available=available_tables_count($pdo); $cid=current_client_id(); $reservas=[]; if($cid){$s=$pdo->prepare("SELECT r.*,m.numero mesa_numero FROM reservas r INNER JOIN mesas m ON m.id=r.mesa_id WHERE r.cliente_id=? ORDER BY r.data_reserva DESC,r.hora_reserva DESC LIMIT 5");$s->execute([$cid]);$reservas=$s->fetchAll();} require __DIR__.'/partials/client-header.php'; ?>
+<?php declare(strict_types=1); require_once __DIR__.'/includes/functions.php';
+$pdo->exec("UPDATE reservas SET status='expirada' WHERE status IN ('pendente','confirmada') AND TIMESTAMP(data_reserva, hora_reserva) < NOW();"); require_login(); if(is_admin()) redirect('dashboard.php'); $available=available_tables_count($pdo); $cid=current_client_id(); $reservas=[]; if($cid){$s=$pdo->prepare("SELECT r.*,m.numero mesa_numero FROM reservas r INNER JOIN mesas m ON m.id=r.mesa_id WHERE r.cliente_id=? ORDER BY r.data_reserva DESC,r.hora_reserva DESC LIMIT 5");$s->execute([$cid]);$reservas=$s->fetchAll();} require __DIR__.'/partials/client-header.php'; ?>
 <div class="client-hero">
     <div>
         <span class="eyebrow gold">RESTAURANTE MESARESERVA</span>

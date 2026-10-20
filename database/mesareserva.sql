@@ -54,7 +54,7 @@ CREATE TABLE reservas (
     data_reserva DATE NOT NULL,
     hora_reserva TIME NOT NULL,
     pessoas TINYINT UNSIGNED NOT NULL,
-    status ENUM('pendente','confirmada','cancelada','concluida') NOT NULL DEFAULT 'pendente',
+    status ENUM('pendente','confirmada','cancelada','concluida','expirada') NOT NULL DEFAULT 'pendente',
     observacoes VARCHAR(500) NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_reservas_data(data_reserva), INDEX idx_reservas_mesa_hora(mesa_id,data_reserva,hora_reserva),

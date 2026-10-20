@@ -66,8 +66,9 @@ return match ($status) {
 'ocupada' => 'Ocupada',
 'pendente' => 'Pendente',
 'confirmada' => 'Confirmada',
-'cancelada' => 'Cancelada',
+'cancelada' => 'Recusada',
 'concluida' => 'Concluída',
+'expirada' => 'Reserva expirada',
 default => ucfirst($status),
 };
 }
@@ -81,6 +82,7 @@ return match ($status) {
 'pendente' => 'status-pendente',
 'cancelada' => 'status-cancelada',
 'concluida' => 'status-concluida',
+'expirada' => 'status-cancelada',
 default => 'status-default',
 };
 }

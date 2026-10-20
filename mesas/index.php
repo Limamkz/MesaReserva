@@ -6,10 +6,19 @@ $pageTitle = 'Mesas';
 
 $mesas = $pdo->query(
 "SELECT m.*,
-COALESCE(SUM(c.quantidade * c.valor_unitario),0) AS total_gasto
+ CASE
+   WHEN m.status = 'ocupada' THEN 'ocupada'
+   WHEN EXISTS (
+      SELECT 1 FROM reservas r
+      WHERE r.mesa_id = m.id AND r.data_reserva = CURDATE()
+        AND r.status = 'confirmada' AND TIMESTAMP(r.data_reserva, r.hora_reserva) >= NOW()
+   ) THEN 'reservada'
+   ELSE 'disponivel'
+ END AS status_dia,
+ COALESCE((SELECT SUM(c.quantidade * c.valor_unitario)
+           FROM consumos c
+           WHERE c.mesa_id = m.id AND DATE(c.created_at) = CURDATE()), 0) AS total_gasto
 FROM mesas m
-LEFT JOIN consumos c ON c.mesa_id = m.id
-GROUP BY m.id
 ORDER BY m.numero"
 )->fetchAll();
 
@@ -18,7 +27,7 @@ require __DIR__ . '/../partials/header.php';
 <div class="page-heading">
     <div>
         <h2>Mesas do restaurante</h2>
-        <p>Controle a capacidade, o status e o total gasto em cada mesa.</p>
+        <p>O status e o consumo exibidos correspondem ao dia de hoje.</p>
     </div>
     <div class="actions">
         <a class="btn btn-primary" href="<?= url('mesas/form.php') ?>">
@@ -47,7 +56,7 @@ require __DIR__ . '/../partials/header.php';
                                 </div>
                                 <div class="table-map">
                                     <?php foreach ($mesas as $mesa): ?>
-                                    <div class="table-card <?= e($mesa['status']) ?>">
+                                    <div class="table-card <?= e($mesa['status_dia']) ?>">
                                         <div class="table-top">
                                             <div>
                                                 <div class="table-number">Mesa <?= e($mesa['numero']) ?>
@@ -55,11 +64,11 @@ require __DIR__ . '/../partials/header.php';
                                                 <div class="capacity">
                                                     <?= (int)$mesa['capacidade'] ?> lugares</div>
                                                 </div>
-                                                <span class="status-badge <?= status_class($mesa['status']) ?>">
-                                                    <?= status_label($mesa['status']) ?>
+                                                <span class="status-badge <?= status_class($mesa['status_dia']) ?>">
+                                                    <?= status_label($mesa['status_dia']) ?>
                                                 </span>
                                             </div>
-                                            <div class="table-total">Total da mesa<strong>
+                                            <div class="table-total">Consumo de hoje<strong>
                                                 <?= money($mesa['total_gasto']) ?>
                                             </strong>
                                         </div>
@@ -98,7 +107,7 @@ require __DIR__ . '/../partials/header.php';
                                             <th>Mesa</th>
                                             <th>Capacidade</th>
                                             <th>Status</th>
-                                            <th>Total gasto</th>
+                                            <th>Consumo de hoje</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -115,8 +124,8 @@ require __DIR__ . '/../partials/header.php';
                                             <td>
                                                 <?= (int)$mesa['capacidade'] ?> pessoas</td>
                                                 <td>
-                                                    <span class="status-badge <?= status_class($mesa['status']) ?>">
-                                                        <?= status_label($mesa['status']) ?>
+                                                    <span class="status-badge <?= status_class($mesa['status_dia']) ?>">
+                                                        <?= status_label($mesa['status_dia']) ?>
                                                     </span>
                                                 </td>
                                                 <td>

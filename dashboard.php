@@ -2,23 +2,27 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/includes/functions.php';
+
+// Atualiza reservas cujo horário já passou antes de exibir os dados.
+$pdo->exec("UPDATE reservas SET status='expirada' WHERE status IN ('pendente','confirmada') AND TIMESTAMP(data_reserva, hora_reserva) < NOW();");
 require_admin();
 
 $pageTitle = 'Dashboard';
 
 $totalMesas = (int)$pdo->query("SELECT COUNT(*) FROM mesas")->fetchColumn();
-$disponiveis = (int)$pdo->query("SELECT COUNT(*) FROM mesas WHERE status = 'disponivel'")->fetchColumn();
-$reservadas = (int)$pdo->query("SELECT COUNT(*) FROM mesas WHERE status = 'reservada'")->fetchColumn();
+$disponiveis = (int)$pdo->query("SELECT COUNT(*) FROM mesas m WHERE m.status <> 'ocupada' AND NOT EXISTS (SELECT 1 FROM reservas r WHERE r.mesa_id=m.id AND r.data_reserva=CURDATE() AND r.status='confirmada' AND TIMESTAMP(r.data_reserva,r.hora_reserva)>=NOW())")->fetchColumn();
+$reservadas = (int)$pdo->query("SELECT COUNT(*) FROM mesas m WHERE m.status <> 'ocupada' AND EXISTS (SELECT 1 FROM reservas r WHERE r.mesa_id=m.id AND r.data_reserva=CURDATE() AND r.status='confirmada' AND TIMESTAMP(r.data_reserva,r.hora_reserva)>=NOW())")->fetchColumn();
 $ocupadas = (int)$pdo->query("SELECT COUNT(*) FROM mesas WHERE status = 'ocupada'")->fetchColumn();
 
 $consumoTotal = (float)$pdo->query("SELECT COALESCE(SUM(quantidade * valor_unitario),0) FROM consumos")->fetchColumn();
 
 $mesas = $pdo->query(
 "SELECT m.*,
-COALESCE(SUM(c.quantidade * c.valor_unitario),0) AS total_gasto
+CASE WHEN m.status='ocupada' THEN 'ocupada'
+     WHEN EXISTS (SELECT 1 FROM reservas r WHERE r.mesa_id=m.id AND r.data_reserva=CURDATE() AND r.status='confirmada' AND TIMESTAMP(r.data_reserva,r.hora_reserva)>=NOW()) THEN 'reservada'
+     ELSE 'disponivel' END AS status_dia,
+COALESCE((SELECT SUM(c.quantidade*c.valor_unitario) FROM consumos c WHERE c.mesa_id=m.id AND DATE(c.created_at)=CURDATE()),0) AS total_gasto
 FROM mesas m
-LEFT JOIN consumos c ON c.mesa_id = m.id
-GROUP BY m.id
 ORDER BY m.numero"
 )->fetchAll();
 
@@ -98,7 +102,7 @@ require __DIR__ . '/partials/header.php';
                         <div class="card-header">
                             <div>
                                 <h3>Mapa das mesas</h3>
-                                <span>Capacidade e consumo acumulado</span>
+                                <span>Capacidade e consumo de hoje</span>
                             </div>
                             <a href="<?= url('mesas/index.php') ?>" class="btn btn-light btn-sm">Gerenciar</a>
                         </div>
@@ -122,7 +126,7 @@ require __DIR__ . '/partials/header.php';
                                         <?php else: ?>
                                         <div class="table-map">
                                             <?php foreach ($mesas as $mesa): ?>
-                                            <a class="table-card <?= e($mesa['status']) ?>" href="<?= url('mesas/form.php?id=' . (int)$mesa['id']) ?>">
+                                            <a class="table-card <?= e($mesa['status_dia']) ?>" href="<?= url('mesas/form.php?id=' . (int)$mesa['id']) ?>">
                                                 <div class="table-top">
                                                     <div>
                                                         <div class="table-number">Mesa <?= e($mesa['numero']) ?>
@@ -130,11 +134,11 @@ require __DIR__ . '/partials/header.php';
                                                         <div class="capacity">
                                                             <?= (int)$mesa['capacidade'] ?> pessoas</div>
                                                         </div>
-                                                        <span class="status-badge <?= status_class($mesa['status']) ?>">
-                                                            <?= status_label($mesa['status']) ?>
+                                                        <span class="status-badge <?= status_class($mesa['status_dia']) ?>">
+                                                            <?= status_label($mesa['status_dia']) ?>
                                                         </span>
                                                     </div>
-                                                    <div class="table-total">Total consumido<strong>
+                                                    <div class="table-total">Consumo de hoje<strong>
                                                         <?= money($mesa['total_gasto']) ?>
                                                     </strong>
                                                 </div>

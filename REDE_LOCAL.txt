@@ -1,0 +1,54 @@
+MESARESERVA — ACESSO PELA REDE LOCAL (WINDOWS + XAMPP)
+======================================================
+
+O QUE ISSO FAZ
+Seu computador hospeda o MesaReserva e os outros dispositivos acessam pelo navegador
+usando o IP local do seu computador. Todos precisam estar na mesma rede Wi-Fi/roteador.
+
+1) PREPARE A PASTA
+- Extraia a pasta MesaReserva para: C:\xampp\htdocs\MesaReserva
+- Se o projeto já estiver nessa pasta, não precisa copiar de novo.
+
+2) INICIE O SERVIDOR
+- Abra o XAMPP Control Panel.
+- Clique em Start para Apache e MySQL.
+- Confirme que os dois ficaram verdes.
+- No computador que hospeda o site, teste: http://localhost/MesaReserva/
+
+3) DESCUBRA O IP DO COMPUTADOR
+- Para consultar o endereço IPv4, abra o Prompt de Comando (CMD) e execute `ipconfig`.
+- O arquivo iniciar-rede-local.bat é apenas um auxiliar opcional; ele não é necessário para o site funcionar e agora usa apenas comandos nativos do CMD, sem chamar PowerShell.
+- O site PHP não chama PowerShell. Se uma janela do PowerShell pisca ao navegar pelo site, ela está sendo iniciada por outro processo do Windows, atalho, tarefa agendada, antivírus ou ferramenta externa; não há chamada PowerShell no código deste projeto.
+- O endereço para seus amigos será parecido com:
+  http://192.168.0.25/MesaReserva/
+  Use o IP real mostrado no seu computador, não copie o exemplo.
+- Envie esse endereço para os amigos conectados à mesma rede.
+
+4) LIBERE O APACHE NO FIREWALL DO WINDOWS
+Se os amigos não conseguirem abrir o site:
+- No Windows, abra “Segurança do Windows” > “Firewall e proteção de rede” >
+  “Permitir um aplicativo pelo firewall”.
+- Permita o Apache HTTP Server nas redes PRIVADAS.
+- Se não aparecer, clique em “Permitir outro aplicativo” e selecione:
+  C:\xampp\apache\bin\httpd.exe
+- Marque apenas a rede privada/confiável. Não desative o firewall inteiro.
+- Se aparecer uma janela do Firewall quando iniciar o Apache, permita em redes privadas.
+
+5) LINKS DE VERIFICAÇÃO DE E-MAIL
+A versão corrigida monta o link de confirmação usando o mesmo endereço pelo qual
+cada pessoa abriu o site. Assim, se o cadastro foi feito em
+  http://192.168.0.25/MesaReserva/
+o e-mail terá um link usando esse IP, em vez de localhost.
+Não é necessário alterar APP_URL para cada amigo. Cada pessoa deve abrir o site
+pelo endereço da rede local antes de criar a conta. O link continua válido por
+24 horas e só pode ser usado uma vez.
+
+OBSERVAÇÕES
+- O computador servidor precisa ficar ligado, com Apache e MySQL iniciados.
+- Use uma rede privada/confiável. Não encaminhe portas do roteador para a internet.
+- Se um amigo estiver em rede de convidados, o roteador pode bloquear a comunicação
+  entre dispositivos; conectem-se à rede principal.
+- O banco MySQL fica no computador servidor; os amigos acessam o site pelo Apache,
+  não diretamente pelo MySQL.
+- Se o Apache não iniciar, pode haver outro programa usando a porta 80 (por exemplo,
+  IIS). Resolva o conflito de porta antes de testar.

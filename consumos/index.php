@@ -9,6 +9,22 @@ FROM consumos c INNER JOIN mesas m ON m.id=c.mesa_id
 ORDER BY c.created_at DESC"
 )->fetchAll();
 $total=(float)$pdo->query("SELECT COALESCE(SUM(quantidade*valor_unitario),0) FROM consumos")->fetchColumn();
+$resumoPeriodo = $pdo->query(
+    "SELECT
+      COALESCE(SUM(CASE WHEN DATE(c.created_at)=CURDATE() THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS diario,
+      COALESCE(SUM(CASE WHEN YEARWEEK(c.created_at,1)=YEARWEEK(CURDATE(),1) THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS semanal,
+      COALESCE(SUM(CASE WHEN YEAR(c.created_at)=YEAR(CURDATE()) AND MONTH(c.created_at)=MONTH(CURDATE()) THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS mensal
+     FROM consumos c"
+)->fetch();
+$porMesa = $pdo->query(
+    "SELECT m.numero,
+      COALESCE(SUM(CASE WHEN DATE(c.created_at)=CURDATE() THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS diario,
+      COALESCE(SUM(CASE WHEN YEARWEEK(c.created_at,1)=YEARWEEK(CURDATE(),1) THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS semanal,
+      COALESCE(SUM(CASE WHEN YEAR(c.created_at)=YEAR(CURDATE()) AND MONTH(c.created_at)=MONTH(CURDATE()) THEN c.quantidade*c.valor_unitario ELSE 0 END),0) AS mensal
+     FROM mesas m LEFT JOIN consumos c ON c.mesa_id=m.id
+     GROUP BY m.id, m.numero ORDER BY m.numero"
+)->fetchAll();
+
 require __DIR__.'/../partials/header.php';
 ?>
 <div class="page-heading">
@@ -43,7 +59,23 @@ require __DIR__.'/../partials/header.php';
                 <div class="stat-label">Valor total registrado</div>
             </div>
         </section>
+        <section class="stats-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:20px">
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="material-symbols-outlined">today</span></div></div><div class="stat-value"><?= money($resumoPeriodo['diario']) ?></div><div class="stat-label">Consumo diário</div></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="material-symbols-outlined">date_range</span></div></div><div class="stat-value"><?= money($resumoPeriodo['semanal']) ?></div><div class="stat-label">Consumo semanal</div></div>
+            <div class="stat-card"><div class="stat-top"><div class="stat-icon"><span class="material-symbols-outlined">calendar_month</span></div></div><div class="stat-value"><?= money($resumoPeriodo['mensal']) ?></div><div class="stat-label">Consumo mensal</div></div>
+        </section>
+        <section class="card" style="margin-bottom:20px">
+            <div class="card-header"><div><h3>Comparativo de consumo por mesa</h3><span>Valores separados por período</span></div></div>
+            <div class="data-table-wrap"><table class="data-table">
+                <thead><tr><th>Mesa</th><th>Hoje</th><th>Esta semana</th><th>Este mês</th></tr></thead>
+                <tbody><?php foreach ($porMesa as $pm): ?><tr>
+                    <td><strong>Mesa <?= e($pm['numero']) ?></strong></td>
+                    <td><?= money($pm['diario']) ?></td><td><?= money($pm['semanal']) ?></td><td><?= money($pm['mensal']) ?></td>
+                </tr><?php endforeach; ?></tbody>
+            </table></div>
+        </section>
         <section class="card">
+            <div class="card-header"><div><h3>Lançamentos de consumo</h3><span>Histórico completo; o total nas mesas é reiniciado diariamente por cálculo de data</span></div></div>
             <div class="data-table-wrap">
                 <table class="data-table">
                     <thead>

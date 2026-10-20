@@ -21,15 +21,16 @@ unset($_SESSION['verification_sent'], $_SESSION['verification_mail_error']);
 $token = trim($_GET['token'] ?? '');
 if ($token !== '') {
 $hash = verification_hash($token);
-$s = $pdo->prepare("SELECT id,email FROM usuarios WHERE token_verificacao=? AND token_expira_em>=NOW() LIMIT 1");
+$s = $pdo->prepare("SELECT id,nome,email,senha,tipo,cliente_id,avatar,ativo,email_verificado_em FROM usuarios WHERE token_verificacao=? AND token_expira_em>=NOW() LIMIT 1");
 $s->execute([$hash]);
 $u = $s->fetch();
 
 if ($u) {
 $pdo->prepare("UPDATE usuarios SET email_verificado_em=NOW(),token_verificacao=NULL,token_expira_em=NULL WHERE id=?")->execute([$u['id']]);
-$success = true;
-$message = 'E-mail verificado com sucesso. Agora você já pode entrar.';
-unset($_SESSION['verification_email']);
+$u['email_verificado_em'] = date('Y-m-d H:i:s');
+login_user($u);
+unset($_SESSION['verification_email'], $_SESSION['verification_sent'], $_SESSION['verification_mail_error']);
+redirect($u['tipo'] === 'admin' ? 'dashboard.php' : 'cliente.php');
 } else {
 $message = 'O link é inválido, já foi usado ou expirou.';
 }
