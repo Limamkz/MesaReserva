@@ -44,6 +44,7 @@ require __DIR__.'/../partials/header.php';
                                     <th>Mesa</th>
                                     <th>Pessoas</th>
                                     <th>Status</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -73,7 +74,7 @@ require __DIR__.'/../partials/header.php';
                                     </td>
                                     <td>
                                         <?php if ($r['status'] === 'expirada'): ?>
-                                            <span class="status-badge status-expirada reservation-expired-label">Reserva expirada</span>
+                                            <span class="status-badge status-expirada reservation-expired-label">Expirado</span>
                                         <?php else: ?>
                                             <form class="reservation-status-form" method="post" action="<?= url('reservas/atualizar-status.php') ?>">
                                                 <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
@@ -90,6 +91,15 @@ require __DIR__.'/../partials/header.php';
                                             </form>
                                         <?php endif; ?>
                                     </td>
+                                    <td>
+                                        <form method="post" action="<?= url('reservas/delete.php') ?>" onsubmit="return confirm('Tem certeza que deseja excluir esta reserva? Esta ação não pode ser desfeita.');">
+                                            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
+                                            <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+                                            <button type="submit" class="btn btn-light btn-sm reservation-delete-btn" aria-label="Excluir reserva <?= (int)$r['id'] ?>">
+                                                <span class="material-symbols-outlined">delete</span>Excluir
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -105,6 +115,9 @@ require __DIR__.'/../partials/header.php';
                 <style>
 .status-expirada { color:#7b4d18; background:#f8ead1; }
 .reservation-status-form { min-width: 175px; }
+.reservation-delete-btn { color:#b42318; border-color:#f0c7c4; gap:5px; }
+.reservation-delete-btn:hover { background:#fff0ef; }
+.reservation-delete-btn .material-symbols-outlined { font-size:18px; }
 .reservation-status-select { min-width: 175px; padding: 9px 30px 9px 10px; font-size: 13px; }
 .reservation-status-select:disabled { opacity: .8; cursor: not-allowed; }
 .reservation-expired-label { display: inline-flex; align-items: center; min-height: 36px; white-space: nowrap; }

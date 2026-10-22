@@ -68,7 +68,7 @@ return match ($status) {
 'confirmada' => 'Confirmada',
 'cancelada' => 'Recusada',
 'concluida' => 'Concluída',
-'expirada' => 'Reserva expirada',
+'expirada' => 'Expirado',
 default => ucfirst($status),
 };
 }
@@ -182,7 +182,32 @@ $message = "Olá, {$nome}!\n\nSua conta no MesaReserva foi criada com sucesso. P
 return send_smtp_mail($email, $subject, $message);
 }
 
-function available_tables_count(PDO $pdo): int { return (int)$pdo->query("SELECT COUNT(*) FROM mesas WHERE status='disponivel'")->fetchColumn(); }
+function available_tables_count(PDO $pdo): int
+{
+    // Libera mesas cujo status ficou como "reservada" após o horário passar.
+    // Uma reserva confirmada futura de hoje mantém a mesa reservada; mesas ocupadas
+    // manualmente nunca são liberadas por esta rotina.
+    $pdo->exec("UPDATE mesas m
+        SET m.status = 'disponivel'
+        WHERE m.status = 'reservada'
+          AND NOT EXISTS (
+              SELECT 1 FROM reservas r
+              WHERE r.mesa_id = m.id
+                AND r.status = 'confirmada'
+                AND r.data_reserva = CURDATE()
+                AND TIMESTAMP(r.data_reserva, r.hora_reserva) >= NOW()
+          )");
+
+    return (int)$pdo->query("SELECT COUNT(*) FROM mesas m
+        WHERE m.status <> 'ocupada'
+          AND NOT EXISTS (
+              SELECT 1 FROM reservas r
+              WHERE r.mesa_id = m.id
+                AND r.status = 'confirmada'
+                AND r.data_reserva = CURDATE()
+                AND TIMESTAMP(r.data_reserva, r.hora_reserva) >= NOW()
+          )")->fetchColumn();
+}
 
 function current_user_avatar(): ?string
 {
