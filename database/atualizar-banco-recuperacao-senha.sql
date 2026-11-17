@@ -1,0 +1,2 @@
+-- A recuperação de senha é criada automaticamente para administradores e clientes.
+-- Campos: token_redefinicao_senha e token_redefinicao_expira.

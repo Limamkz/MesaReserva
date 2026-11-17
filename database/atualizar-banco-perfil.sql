@@ -1,0 +1,2 @@
+-- O perfil agora utiliza as colunas da tabela clientes ou administradores.
+-- A estrutura é atualizada automaticamente por config/database.php.

@@ -1,0 +1,3 @@
+-- Atualização de estrutura: abra o MesaReserva após fazer backup.
+-- config/database.php migra automaticamente usuarios para administradores + clientes.
+-- Para uma instalação limpa, utilize database/mesareserva.sql.

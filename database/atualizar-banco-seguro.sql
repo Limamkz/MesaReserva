@@ -1,0 +1,3 @@
+-- Atualização segura: faça backup e abra o MesaReserva.
+-- config/database.php executa a migração das contas e dos relacionamentos.
+-- Para instalação limpa, importe mesareserva.sql.
