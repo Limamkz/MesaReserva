@@ -4,6 +4,8 @@ require_once __DIR__ . '/../includes/functions.php';
 require_admin();
 $id=(int)($_GET['id']??0);$consumo=['mesa_id'=>'','descricao'=>'','quantidade'=>1,'valor_unitario'=>''];
 if($id){$s=$pdo->prepare("SELECT * FROM consumos WHERE id=?");$s->execute([$id]);$consumo=$s->fetch();if(!$consumo){flash('error','Consumo não encontrado.');redirect('consumos/index.php');}}
+if(!$id && isset($_GET['mesa'])){$consumo['mesa_id']=(int)$_GET['mesa'];}
+$voltarMesa=(int)($consumo['mesa_id']?:0);
 $mesas=$pdo->query("SELECT id,numero,status FROM mesas ORDER BY numero")->fetchAll();
 $pageTitle=$id?'Editar consumo':'Novo consumo';
 require __DIR__.'/../partials/header.php';
@@ -46,7 +48,7 @@ require __DIR__.'/../partials/header.php';
                 </div>
             </div>
             <div class="form-actions">
-                <a class="btn btn-light" href="<?= url('consumos/index.php') ?>">Cancelar</a>
+                <a class="btn btn-light" href="<?= url('consumos/index.php' . ($voltarMesa ? '?mesa=' . $voltarMesa : '')) ?>">Cancelar</a>
                 <button class="btn btn-primary">
                     <span class="material-symbols-outlined">save</span>Salvar consumo</button>
                     </div>

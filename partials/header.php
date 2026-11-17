@@ -19,7 +19,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..600,0..1,0..200&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261115pro1') ?>">
+        <link rel="stylesheet" href="<?= url('assets/css/style.css?v=20261117ajustes') ?>">
     </head>
     <body>
         <div class="app-shell">

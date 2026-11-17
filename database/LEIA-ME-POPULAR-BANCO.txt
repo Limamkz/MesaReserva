@@ -1,0 +1,21 @@
+POPULAR BANCO DE DADOS - MESARESERVA
+
+1. Faça uma cópia de segurança do banco MesaReserva.
+2. Inicie Apache e MySQL no XAMPP.
+3. Confirme que o banco MesaReserva já foi criado/importado.
+4. Abra no navegador: http://localhost/MesaReserva/database/popular-banco.php
+5. Após a mensagem de sucesso, remova ou renomeie popular-banco.php por segurança.
+
+CONTAS DEMONSTRATIVAS
+Senha de todas as contas criadas por este script: Mesa@2026
+
+Administradores:
+- mariana.costa@mesareserva.test
+- rafael.almeida@mesareserva.test
+- camila.oliveira@mesareserva.test
+
+Clientes: 30 contas, com e-mail, telefone e senha vinculados. Os e-mails individuais seguem o padrão nome.sobrenome@example.com.
+
+O script cria 12 mesas (ou atualiza as mesas 1 a 12), 105 reservas, consumos históricos distribuídos por todas as mesas, 15 perguntas de atendimento e 24 avaliações de 4 ou 5 estrelas. Ele é protegido por marcador e não duplica os dados ao ser executado novamente.
+
+IMPORTANTE: dados são fictícios para demonstração. Os domínios .test e .example.com são destinados a exemplos e não representam contatos reais. Altere a senha e remova o script antes de colocar o sistema em produção.

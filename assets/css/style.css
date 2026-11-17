@@ -8371,3 +8371,286 @@ textarea.form-control {
         transition: none;
     }
 }
+
+/* =====================================================================
+   AJUSTES — calendário claro, página Reservar e painel de reservas (admin)
+   ===================================================================== */
+
+/* Calendário das reservas: fundo claro para o número sempre aparecer */
+.res-calendar {
+    border: 1px solid #e6d3ac;
+    background:
+        radial-gradient(120% 90% at 50% 0%, rgba(208, 164, 90, .22), transparent 62%),
+        linear-gradient(180deg, #fffdf8, #f8eed8);
+    box-shadow: 0 6px 16px rgba(57, 40, 23, .1), inset 0 1px 0 #fff;
+}
+
+.res-calendar .res-month {
+    border-bottom: 1px solid rgba(168, 121, 44, .3);
+    color: #a8792c;
+}
+
+.res-calendar .res-day {
+    color: #2b1d12;
+}
+
+.res-calendar::before,
+.res-calendar::after {
+    box-shadow: 0 1px 2px rgba(57, 40, 23, .25);
+}
+
+.reservation-row-client.is-expirada .res-calendar,
+.reservation-row-client.is-cancelada .res-calendar,
+.reservation-row-client.is-concluida .res-calendar {
+    opacity: .8;
+    filter: saturate(.5);
+}
+
+/* Banner da página Reservar */
+.reserva-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 22px;
+    padding: 26px 32px;
+    border: 1px solid var(--mr-border, #eee5d9);
+    border-left: 5px solid #c9a057;
+    border-radius: 20px;
+    background: linear-gradient(120deg, #fffefc 0%, #faf1de 100%);
+    box-shadow: 0 12px 32px rgba(57, 40, 23, .07);
+}
+
+.reserva-hero .eyebrow {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #a8792c;
+}
+
+.reserva-hero h1 {
+    margin: 0 0 6px;
+    font: 600 30px/1.15 'Playfair Display', Georgia, serif;
+    color: #211914;
+}
+
+.reserva-hero p {
+    margin: 0;
+    max-width: 52ch;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #6f6153;
+}
+
+.reserva-steps {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reserva-steps li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px 8px 8px;
+    border: 1px solid #e6dccb;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #8a7d6f;
+    white-space: nowrap;
+    transition: all .2s ease;
+}
+
+.reserva-steps li span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #efe6d6;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7a6a55;
+}
+
+.reserva-steps li.is-active {
+    border-color: #c9a057;
+    background: #fdf3dc;
+    color: #5b3f12;
+}
+
+.reserva-steps li.is-active span,
+.reserva-steps li.is-done span {
+    background: #a8792c;
+    color: #fff;
+}
+
+.reserva-steps li.is-done {
+    color: #5b3f12;
+}
+
+@media (max-width: 900px) {
+    .reserva-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .reserva-steps {
+        flex-wrap: wrap;
+    }
+}
+
+/* Escolha de mesa após data e horário */
+.mesa-picker-hint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px;
+    border: 1px dashed #dccbb0;
+    border-radius: 14px;
+    background: #fbf7ef;
+    font-size: 13.5px;
+    color: #7a6d5f;
+}
+
+.mesa-picker-hint .material-symbols-outlined {
+    color: #a8792c;
+}
+
+.mesa-summary {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #e4f1e6;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2f6b3d;
+}
+
+.mesa-summary.is-empty {
+    background: #f7e4e1;
+    color: #a6423a;
+}
+
+.mesa-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.mesa-option {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 16px;
+    border: 1.5px solid #e6dccb;
+    border-radius: 14px;
+    background: #fffefc;
+    cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.mesa-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mesa-option .mesa-num {
+    font-size: 16px;
+    font-weight: 700;
+    color: #211914;
+}
+
+.mesa-option .mesa-cap {
+    font-size: 12px;
+    color: #8a7d6f;
+}
+
+.mesa-option .mesa-state {
+    margin-top: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.mesa-option.is-livre .mesa-state {
+    color: #2f6b3d;
+}
+
+.mesa-option.is-livre:hover {
+    border-color: #c9a057;
+    box-shadow: 0 8px 20px rgba(57, 40, 23, .08);
+}
+
+.mesa-option.is-livre:has(input:checked) {
+    border-color: #a8792c;
+    background: #fdf3dc;
+    box-shadow: 0 0 0 3px rgba(168, 121, 44, .18);
+}
+
+.mesa-option.is-livre:has(input:focus-visible) {
+    outline: 2px solid #a8792c;
+    outline-offset: 2px;
+}
+
+.mesa-option.is-reservada,
+.mesa-option.is-pequena {
+    background: #f6f2ec;
+    cursor: not-allowed;
+}
+
+.mesa-option.is-reservada .mesa-num,
+.mesa-option.is-pequena .mesa-num {
+    color: #9a8f83;
+}
+
+.mesa-option.is-reservada .mesa-state {
+    color: #a6423a;
+}
+
+.mesa-option.is-pequena .mesa-state {
+    color: #8a7d6f;
+}
+
+#submitReserva:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+/* Painel de reservas do admin */
+.app-shell .stats-grid.stats-grid-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1000px) {
+    .app-shell .stats-grid.stats-grid-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .app-shell .stats-grid.stats-grid-4 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+a.stat-card.stat-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.reservation-group {
+    margin-top: 22px;
+    scroll-margin-top: 20px;
+}

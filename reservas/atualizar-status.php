@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 verify_csrf();
 
+expirar_reservas($pdo);
 $id = (int)($_POST['id'] ?? 0);
 $status = (string)($_POST['status'] ?? '');
 
@@ -39,7 +40,11 @@ try {
         redirect('reservas/index.php');
     }
 
-    $pdo->prepare('UPDATE reservas SET status = ? WHERE id = ?')->execute([$status, $id]);
+    if ($status === 'cancelada') {
+        $pdo->prepare("UPDATE reservas SET status = ?, cancelada_por = 'admin', cancelada_em = NOW() WHERE id = ?")->execute([$status, $id]);
+    } else {
+        $pdo->prepare('UPDATE reservas SET status = ?, cancelada_por = NULL, cancelada_em = NULL WHERE id = ?')->execute([$status, $id]);
+    }
 
     if ($status === 'confirmada') {
         $pdo->prepare("UPDATE mesas SET status='reservada' WHERE id=? AND status<>'ocupada'")
@@ -47,7 +52,7 @@ try {
         flash('success', 'Reserva confirmada.');
     } elseif ($status === 'cancelada' || $status === 'concluida') {
         update_table_status_from_reservation($pdo, (int)$reserva['mesa_id']);
-        flash('success', $status === 'cancelada' ? 'Reserva recusada.' : 'Reserva marcada como concluída.');
+        flash('success', $status === 'cancelada' ? 'Reserva cancelada.' : 'Reserva marcada como concluída.');
     } else {
         flash('success', 'Reserva voltou para pendente.');
     }

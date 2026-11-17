@@ -66,7 +66,7 @@ return match ($status) {
 'ocupada' => 'Ocupada',
 'pendente' => 'Pendente',
 'confirmada' => 'Confirmada',
-'cancelada' => 'Recusada',
+'cancelada' => 'Cancelada',
 'concluida' => 'Concluída',
 'expirada' => 'Expirada',
 default => ucfirst($status),
@@ -342,3 +342,69 @@ function current_user_avatar(): ?string
     }
 }
 
+/** Minutos que a administração tem para aceitar ou recusar uma reserva pendente. */
+const RESERVA_PRAZO_MINUTOS = 30;
+
+/**
+ * Expira reservas automaticamente:
+ *  - pendentes sem resposta há RESERVA_PRAZO_MINUTOS minutos (ou cujo horário já passou);
+ *  - confirmadas cujo horário já passou.
+ * Também garante que o banco aceite o status "expirada" (instalações antigas) e
+ * corrige reservas que ficaram com status vazio por causa disso.
+ */
+function expirar_reservas(PDO $pdo): void
+{
+    static $executado = false;
+    if ($executado) {
+        return;
+    }
+    $executado = true;
+
+    // Campos que registram quem cancelou a reserva e quando (criados automaticamente).
+    try {
+        if (!$pdo->query("SHOW COLUMNS FROM reservas LIKE 'cancelada_por'")->fetch()) {
+            $pdo->exec("ALTER TABLE reservas
+                        ADD COLUMN cancelada_por ENUM('cliente','admin') NULL DEFAULT NULL,
+                        ADD COLUMN cancelada_em DATETIME NULL DEFAULT NULL");
+        }
+    } catch (PDOException $e) {
+        // Segue sem o campo se o banco não permitir a alteração.
+    }
+
+    try {
+        $col = $pdo->query("SHOW COLUMNS FROM reservas LIKE 'status'")->fetch();
+        if ($col && stripos((string)$col['Type'], "'expirada'") === false) {
+            $pdo->exec("ALTER TABLE reservas MODIFY COLUMN status
+                        ENUM('pendente','confirmada','cancelada','concluida','expirada')
+                        NOT NULL DEFAULT 'pendente'");
+        }
+
+        $prazo = (int)RESERVA_PRAZO_MINUTOS;
+        $condicao = "(status = '')
+            OR (status = 'pendente' AND (
+                    TIMESTAMPDIFF(MINUTE, created_at, NOW()) >= {$prazo}
+                    OR TIMESTAMP(data_reserva, hora_reserva) < NOW()))
+            OR (status = 'confirmada' AND TIMESTAMP(data_reserva, hora_reserva) < NOW())";
+
+        $mesas = $pdo->query("SELECT DISTINCT mesa_id FROM reservas WHERE {$condicao}")->fetchAll(PDO::FETCH_COLUMN);
+        if ($mesas) {
+            $pdo->exec("UPDATE reservas SET status = 'expirada' WHERE {$condicao}");
+            foreach ($mesas as $mesaId) {
+                update_table_status_from_reservation($pdo, (int)$mesaId);
+            }
+        }
+    } catch (PDOException $e) {
+        // Não derruba a página se o banco não permitir a atualização.
+    }
+}
+
+
+/** Texto de quem cancelou a reserva, para mostrar nas telas. */
+function cancelada_por_label(?string $quem, bool $visaoCliente = false): string
+{
+    return match ($quem) {
+        'cliente' => $visaoCliente ? 'Cancelada por você' : 'Cliente',
+        'admin' => $visaoCliente ? 'Recusada pela administração' : 'Administração',
+        default => $visaoCliente ? '' : 'Não informado',
+    };
+}

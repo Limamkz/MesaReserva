@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/functions.php';
 
 // Atualiza reservas cujo horário já passou antes de exibir os dados.
-$pdo->exec("UPDATE reservas SET status='expirada' WHERE status IN ('pendente','confirmada') AND TIMESTAMP(data_reserva, hora_reserva) < NOW();");
+expirar_reservas($pdo);
 require_admin();
 
 $pageTitle = 'Dashboard';
